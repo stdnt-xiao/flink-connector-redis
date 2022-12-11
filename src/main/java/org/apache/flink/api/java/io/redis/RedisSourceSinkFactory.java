@@ -2,12 +2,15 @@ package org.apache.flink.api.java.io.redis;
 
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.table.api.RichTableSchema;
+import org.apache.flink.table.api.scala.log;
 import org.apache.flink.table.factories.StreamTableSinkFactory;
 import org.apache.flink.table.factories.StreamTableSourceFactory;
 import org.apache.flink.table.sinks.StreamTableSink;
 import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.util.TableProperties;
 import org.apache.flink.types.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +26,8 @@ import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CO
  * @version $Id: RedisSourceSinkFactory.java, v 0.1 2019年11月29日 10:29 AM Exp $
  */
 public class RedisSourceSinkFactory implements StreamTableSourceFactory<Row>, StreamTableSinkFactory<TupleTypeInfo> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(RedisSourceSinkFactory.class);
 	@Override
 	public StreamTableSink<TupleTypeInfo> createStreamTableSink(final Map<String, String> props) {
 		TableProperties properties = new TableProperties();
@@ -34,9 +39,8 @@ public class RedisSourceSinkFactory implements StreamTableSourceFactory<Row>, St
 		String password = properties.getString(RedisOptions.PASSWORD);
 		int db = properties.getInteger(RedisOptions.DB.key(), 0);
 		int batchSize = properties.getInteger(RedisOptions.BATH_SIZE.key(), 1);
-
+		LOG.info(String.format("RedisSourceSinkFactory create RedisOutFormat(%d,%s,%d,%s,%d)", batchSize, host, port, password, db));
 		RedisOutFormat redisOutFormat = new RedisOutFormat(batchSize, host, port, password, db);
-
 		RedisRetractTableSink redisRetractTableSink = new RedisRetractTableSink(redisOutFormat);
 		redisRetractTableSink.setFieldNames(schema.getColumnNames());
 		redisRetractTableSink.setFieldTypes(schema.getColumnTypes());
@@ -80,7 +84,7 @@ public class RedisSourceSinkFactory implements StreamTableSourceFactory<Row>, St
 	@Override
 	public Map<String, String> requiredContext() {
 		Map<String, String> context = new HashMap<>();
-		context.put(CONNECTOR_TYPE, "REDIS");
+		context.put(CONNECTOR_TYPE, "MYREDIS");
 		context.put(CONNECTOR_PROPERTY_VERSION, "1");
 		return context;
 	}
@@ -89,4 +93,6 @@ public class RedisSourceSinkFactory implements StreamTableSourceFactory<Row>, St
 	public List<String> supportedProperties() {
 		return SUPPORTED_KEYS;
 	}
+
+
 }

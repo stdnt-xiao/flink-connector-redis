@@ -1,8 +1,8 @@
 package org.apache.flink.api.java.io.redis;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.io.RichOutputFormat;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.hive.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import java.util.List;
  * @version $Id: RedisOutFormat.java, v 0.1 2019年11月29日 11:05 AM Exp $
  */
 public class RedisOutFormat extends RichOutputFormat<Row> {
-
+	private static final Logger LOG = LoggerFactory.getLogger(RedisOutFormat.class);
 	private static final long serialVersionUID = -3819462971300769382L;
 
 	private static Logger log = LoggerFactory.getLogger(RedisOutFormat.class);
@@ -71,7 +71,9 @@ public class RedisOutFormat extends RichOutputFormat<Row> {
 				cache.clear();
 			}
 		} catch (Exception e) {
-			throw new IllegalArgumentException("redis write() failed.", e);
+			LOG.info(String.format("RedisOutFormat ", e.getMessage()));
+
+			throw new IllegalArgumentException(String.format("redis write() failed.(%d,%s,%d,%s,%d)", batchsize, host, port, password, db), e);
 		}
 
 	}

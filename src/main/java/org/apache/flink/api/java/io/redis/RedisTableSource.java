@@ -5,12 +5,12 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.RichTableSchema;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.api.functions.AsyncTableFunction;
-import org.apache.flink.table.api.functions.TableFunction;
-import org.apache.flink.table.api.types.DataType;
+import org.apache.flink.table.functions.TableFunction;
 import org.apache.flink.table.plan.stats.TableStats;
 import org.apache.flink.table.sources.LookupConfig;
 import org.apache.flink.table.sources.LookupableTableSource;
 import org.apache.flink.table.sources.StreamTableSource;
+import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
 
 import java.util.Set;

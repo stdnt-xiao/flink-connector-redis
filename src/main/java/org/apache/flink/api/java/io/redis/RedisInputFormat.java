@@ -1,5 +1,6 @@
 package org.apache.flink.api.java.io.redis;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.io.RichInputFormat;
 import org.apache.flink.api.common.io.statistics.BaseStatistics;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -8,7 +9,6 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.io.InputSplit;
 import org.apache.flink.core.io.InputSplitAssigner;
-import org.apache.flink.hive.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class RedisInputFormat extends RichInputFormat<Row, InputSplit > implemen
 
 	@Override
 	public Row nextRecord(final Row reuse) throws IOException {
-		return null;
+		return reuse;
 	}
 
 	@Override

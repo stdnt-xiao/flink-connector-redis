@@ -5,13 +5,14 @@
 	<parent>
 		<artifactId>flink-connectors</artifactId>
 		<groupId>com.alibaba.blink</groupId>
-		<version>1.5.1</version>
+		<version>blink-3.3.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>flink-connector-redis</artifactId>
 	<properties>
 		<scala.binary.version>2.11</scala.binary.version>
+		<checkstyle.skip>true</checkstyle.skip>
 	</properties>
 
 
@@ -20,7 +21,7 @@
 			<groupId>com.alibaba.blink</groupId>
 			<artifactId>flink-table_${scala.binary.version}</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<!-- Projects depending on this project,
 			won't depend on flink-table. -->
 			<optional>true</optional>
@@ -30,7 +31,7 @@
 			<groupId>com.alibaba.blink</groupId>
 			<artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -73,7 +74,129 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
-
+	<build>
+		<finalName>${artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>3.2.2</version>
+				<executions>
+					<execution>
+						<id>scala-compile-first</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>add-source</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>scala-test-compile</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/main/scala</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/test/scala</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.7</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<relocations combine.self="override">
+								<relocation>
+									<pattern>org.glassfish.jersey</pattern>
+									<shadedPattern>com.alibaba.blink.shaded.datahub.org.glassfish.jersey</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>com.google.guava</pattern>
+									<shadedPattern>springfox.guava</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>com.google.common</pattern>
+									<shadedPattern>springfox.common</shadedPattern>
+								</relocation>
+							</relocations>
+							<transformers>
+								<transformer
+										implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"/>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<!-- 排除以下文件，防止程序启动启动时，校验错误  -->
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

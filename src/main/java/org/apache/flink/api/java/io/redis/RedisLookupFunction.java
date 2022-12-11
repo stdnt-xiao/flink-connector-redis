@@ -1,9 +1,9 @@
 package org.apache.flink.api.java.io.redis;
 
-import org.apache.flink.table.api.functions.FunctionContext;
-import org.apache.flink.table.api.functions.TableFunction;
-import org.apache.flink.table.api.types.DataType;
 import org.apache.flink.table.dataformat.BinaryString;
+import org.apache.flink.table.functions.FunctionContext;
+import org.apache.flink.table.functions.TableFunction;
+import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
 
 /**
